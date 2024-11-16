@@ -13,11 +13,16 @@ def get_db():
     db.row_factory = sqlite3.Row
     return db
 
+def build_query(column='*', table: str='cafes', condition:str='')-> str:
+    query = f"SELECT {column} from {table}"
+    return query
+
+
 def query_db(query, args=(), one=False):
     cur = get_db().execute(query, args)
     rv = cur.fetchall()
     cur.close()
-    return (rv[0] if rv else None) if one else rv
+    return (rv[0] if rv else none) if one else rv
 
 @app.teardown_appcontext
 def close_connection(exception):
@@ -27,9 +32,11 @@ def close_connection(exception):
 
 @app.route('/')
 def display_index():
-    html = "<b>Welcome to the Cafe Site!</b>"
-    cafe_names = query_db('select name from cafe')
-    for name in cafe_names:
-        html += f"\n check out {name}!"
+    html = "<b>welcome to the cafe site!</b><br>"
+    cafe_name_rows = query_db(build_query("name", "cafe"))
+    for cafe_row in cafe_name_rows:
+        name = cafe_row['name']
+        print(type(cafe_row))
+        html += f"check out {name}<br>"
     return html
 

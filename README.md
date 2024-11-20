@@ -22,4 +22,5 @@ allows users to add and delete cafes.
 9|seats|VARCHAR (250)|0||0
 10|coffee_price|VARCHAR (250)|0||0
 ```
+"id", "name", "map_url", "img_url", "location", "has_sockets", "has_toilet", "has_wifi", "can_take_calls", "seats","coffee_price" 
 

@@ -1,28 +1,22 @@
-import sqlite3
+from flask import Flask, g, render_template
 
-from flask import Flask, g
+from DatabaseManager import get_db, query_db, build_query
+
+PROPERTIES = [
+                "has_sockets",
+                "has_toilet",
+                "has_wifi",
+                "cake_take_calls",
+                "seats",
+                "coffee_price"
+             ]
+
+
 
 app = Flask(__name__)
 
-DATABASE = '/home/mike/code/100_days_of_code/final_projects/cafe_wifi/data/cafes.db'
-
-def get_db():
-    db = getattr(g, '_database', None)
-    if db is None:
-        db = g._database = sqlite3.connect(DATABASE)
-    db.row_factory = sqlite3.Row
-    return db
-
-def build_query(column='*', table: str='cafes', condition:str='')-> str:
-    query = f"SELECT {column} from {table}"
-    return query
-
-
-def query_db(query, args=(), one=False):
-    cur = get_db().execute(query, args)
-    rv = cur.fetchall()
-    cur.close()
-    return (rv[0] if rv else none) if one else rv
+with app.app_context():
+    db = get_db()
 
 @app.teardown_appcontext
 def close_connection(exception):
@@ -31,12 +25,15 @@ def close_connection(exception):
         db.close()
 
 @app.route('/')
-def display_index():
-    html = "<b>welcome to the cafe site!</b><br>"
-    cafe_name_rows = query_db(build_query("name", "cafe"))
-    for cafe_row in cafe_name_rows:
-        name = cafe_row['name']
-        print(type(cafe_row))
-        html += f"check out {name}<br>"
-    return html
+def home():
+    all_rows = query_db("select * from cafe")
+    for row in all_rows:
+        print(row)
+        for field in row:
+            print(field)
+    return render_template("index.html", rows=all_rows)
 
+@app.route('/cafe/<int:cafe_id>')
+def cafe(cafe_id):
+    particular_cafe = query_db(f"select * from cafe where id=={cafe_id}")[0]
+    return render_template("cafe.html", this_cafe=particular_cafe)

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1, shrink-to-fit=no"
+        />
+        <link rel="stylesheet" type="text/css" href="../static/css/styles.css">
+        <title>Cafe Wifi - Cafe Info</title>
+    </head>
+
+    <body id="cafe">
+        <div id="cafe_name">
+            {{ this_cafe.name }}
+        </div>
+
+        <div id="cafe_img">
+            <img src="{{ this_cafe.img_url }}">
+        </div>
+
+        <div id="cafe_location">
+            {{ this_cafe.location }}
+        </div>
+
+        <div id="cafe_map">
+            <img src="{{ this_cafe.map_url }}">
+        </div>
+        
+        <div id="cafe_info_container">
+            <div class="cafe_info_child">
+                <h3>ABOUT {{ this_cafe.name }}</h3>
+            </div>
+            <div id="cafe_properties_container">
+
+                <div class="cafe_properties_child property">
+                    SOCKETS:
+                </div>
+
+                <div class="cafe_properties_child property">
+                    TOILETS:
+                </div>
+
+                <div class="cafe_properties_child property">
+                    WIFI:
+                </div>
+
+                <div class="cafe_properties_child property">
+                    CALLS:
+                </div>
+
+                <div class="cafe_properties_child property">
+                    SEATS:
+                </div>
+
+                <div class="cafe_properties_child property">
+                    COST:
+                </div>
+            </div>
+
+            <div id="property_value_container">
+
+                <div class="cafe_property_value_child">
+                    {{ this_cafe.has_sockets }}
+                </div>
+
+                <div class="cafe_property_value_child">
+                    {{ this_cafe.has_toilets }}
+                </div>
+
+                <div class="cafe_property_value_child">
+                    {{ this_cafe.has_wifi }}
+                </div>
+
+                <div class="cafe_property_value_child">
+                    {{ this_cafe.can_take_calls }}
+                </div>
+
+                <div class="cafe_property_value_child">
+                    {{ this_cafe.seats }}
+                </div>
+
+                <div class="cafe_property_value_child">
+                    {{ this_cafe.coffee_price }}
+                </div>
+
+            </div>
+        </div>
+
+    </body>
+
+    <footer>
+    </footer>
+</html>
+

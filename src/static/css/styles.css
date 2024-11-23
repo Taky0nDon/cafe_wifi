@@ -2,3 +2,21 @@
     color:white;
     text-align: center;
 }
+
+.table {
+    flex-direction: column;
+    justify-content: center;
+}
+
+.row-container {
+    display: flex;
+    justify-content: space-around;
+}
+
+.field {
+    text-align:right;
+}
+
+,name {
+    color:red;
+}

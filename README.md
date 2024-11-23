@@ -7,6 +7,14 @@
 * Use the provided database to create a website that displays the cafes and 
 allows users to add and delete cafes.
 
+## TODOS
+
+1. Line up /cafe columns, with properties on the left and their values on the right
+
+1. When you click a link on the index page, it should bring you to the /cafe page
+for the cafe you clicked, with details about that cafe.
+    * Use cafe id in URL
+]
 ## Table Structure:
 
 ```

@@ -10,9 +10,19 @@
     <title>Cafe WiFi</title>
   </head>
 
-  <body>
+  <body id="index">
       <div class="intro">
           This is the part of the website that lists all the entries in the database.
+          <br>Click on a cafe to learn more about it.
+      </div>
+      <div class="table">
+              {% for row in rows %}
+              <div class="row-container">
+                  <div class="name field">
+                      <a href="cafe/{{ row.id }}">{{ row.name }} </a>
+                  </div>
+              </div>
+              {% endfor %}
       </div>
   </body>
 

@@ -1,9 +1,39 @@
+/*html {
+    display: table;
+    margin: auto;
+}*/
+
+body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+header {
+    display: flex;
+    justify-content: center;
+}
+
+img {
+    max-width: 50%;
+}
+
+#img_container {
+    display: flex;
+    justify-content: center;
+}
+
+.text {
+    text-align: center;
+}
+
 .intro {
     color:white;
     text-align: center;
 }
 
 .table {
+    display: flex;
     flex-direction: column;
     justify-content: center;
 }
@@ -17,6 +47,37 @@
     text-align:right;
 }
 
-,name {
+.name {
     color:red;
+}
+
+.cafe_page {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.cafe_child {
+    display: flex;
+    justify-content: center;
+}
+
+#cafe_info_container {
+    display: flex;
+    justify-content: center;
+}
+
+.property {
+    display: flex;
+    justify-content: space-between;
+}
+
+#cafe_properties_container {
+    flex-direction: row;
+}
+
+.cafe_property_value_child {
+    display: flex;
+    justify-content: space-around;
+
 }

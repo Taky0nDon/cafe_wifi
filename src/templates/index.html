@@ -1,16 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, shrink-to-fit=no"
-    />
-    <link rel="stylesheet" type="text/css" href="../static/css/styles.css"/>
-    <title>Cafe WiFi</title>
-  </head>
+{% include "header.html" %}
 
-  <body id="index">
+<div id="index">
       <div class="intro">
           This is the part of the website that lists all the entries in the database.
           <br>Click on a cafe to learn more about it.
@@ -24,8 +14,6 @@
               </div>
               {% endfor %}
       </div>
-  </body>
+</div>
 
-  <footer>
-  </footer>
-</html>
+{% include "footer.html" %}

@@ -12,6 +12,7 @@ allows users to add and delete cafes.
 1. Add users/auth
 2. Let users add cafes
 3. Let users remove cafes
+4. Nav bar
 1. Line up /cafe columns, with properties on the left and their values on the right
 
 1. When you click a link on the index page, it should bring you to the /cafe page

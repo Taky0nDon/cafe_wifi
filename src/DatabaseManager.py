@@ -35,4 +35,12 @@ def build_query(column='*', condition:str='')-> str:
     query = f"SELECT {column} from cafes"
     return query
 
+def insert(row: dict, table: str, db: sqlite3.Connection) -> None:
+    db.execute('insert into cafe values (30, "test", "test", "test", "test", 1, 1, 1, 1, 10, 10)')
+    db.commit()
+    
+    pass
 
+def remove(id: int, table: str, db: sqlite3.Connection) -> None:
+    db.execute('delete from cafe where id = 30')
+    db.commit()

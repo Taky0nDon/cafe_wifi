@@ -25,7 +25,7 @@ def close_connection(exception):
         db.close()
 
 @app.route('/')
-def home():
+def home() -> str:
     all_rows = query_db("select * from cafe")
     for row in all_rows:
         print(row)
@@ -34,6 +34,14 @@ def home():
     return render_template("index.html", rows=all_rows)
 
 @app.route('/cafe/<int:cafe_id>')
-def cafe(cafe_id):
+def cafe(cafe_id: int) -> str:
     particular_cafe = query_db(f"select * from cafe where id=={cafe_id}")[0]
     return render_template("cafe.html", this_cafe=particular_cafe)
+
+@app.route('/add')
+def add_page() -> str:
+    return render_template("add.html")
+
+@app.route('/delete')
+def delete_page() -> str:
+    return render_template("delete.html")

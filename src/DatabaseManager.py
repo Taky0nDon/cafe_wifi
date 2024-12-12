@@ -35,8 +35,8 @@ def build_query(column='*', condition:str='')-> str:
     query = f"SELECT {column} from cafes"
     return query
 
-def insert(row: dict, table: str, db: sqlite3.Connection) -> None:
-    db.execute('insert into cafe values (30, "test", "test", "test", "test", 1, 1, 1, 1, 10, 10)')
+def insert(row: dict, db: sqlite3.Connection, table: str="cafe") -> None:
+    db.execute(f'insert into cafe values ({str(v for v in row.values())}')
     db.commit()
     
     pass

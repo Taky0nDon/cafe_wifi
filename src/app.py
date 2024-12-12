@@ -1,6 +1,11 @@
+from secrets import token_urlsafe
+
 from flask import Flask, g, render_template
+from flask_wtf import CSRFProtect
 
 from DatabaseManager import get_db, query_db, build_query
+import DatabaseManager
+from forms import AddCafeForm
 
 PROPERTIES = [
                 "has_sockets",
@@ -11,9 +16,23 @@ PROPERTIES = [
                 "coffee_price"
              ]
 
+new_cafe = {
+        "name": None,
+        "map_url": None,
+        "img_url": None,
+        "location": None,
+        "has_sockets": None,
+        "has_toilet": None,
+        "has_wifi": None,
+        "can_take_calls": None,
+        "seats": None,
+        "coffee_price": None,
+        }
 
 
 app = Flask(__name__)
+app.secret_key = token_urlsafe(16)
+csrf = CSRFProtect(app)
 
 with app.app_context():
     db = get_db()
@@ -38,9 +57,17 @@ def cafe(cafe_id: int) -> str:
     particular_cafe = query_db(f"select * from cafe where id=={cafe_id}")[0]
     return render_template("cafe.html", this_cafe=particular_cafe)
 
-@app.route('/add')
+@app.route('/add', methods=["GET", "POST"])
 def add_page() -> str:
-    return render_template("add.html")
+    add_cafe_form = AddCafeForm()
+    print(dir(add_cafe_form))
+    if add_cafe_form.validate_on_submit():
+        print('here')
+        for field in new_cafe:
+            new_cafe[field] = getattr(add_cafe_form, field).data
+        DatabaseManager.insert(new_cafe, db=db)
+        print([v for v in new_cafe.values()])
+    return render_template("add.html", form=add_cafe_form, cafe_data = new_cafe)
 
 @app.route('/delete')
 def delete_page() -> str:

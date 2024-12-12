@@ -1,6 +1,7 @@
 from secrets import token_urlsafe
 
-from flask import Flask, g, render_template
+import werkzeug
+from flask import Flask, g, redirect, render_template, Response
 from flask_wtf import CSRFProtect
 
 from DatabaseManager import get_db, query_db, build_query
@@ -58,15 +59,14 @@ def cafe(cafe_id: int) -> str:
     return render_template("cafe.html", this_cafe=particular_cafe)
 
 @app.route('/add', methods=["GET", "POST"])
-def add_page() -> str:
+def add_page() -> str | werkzeug.wrappers.response.Response:
     add_cafe_form = AddCafeForm()
     print(dir(add_cafe_form))
     if add_cafe_form.validate_on_submit():
-        print('here')
         for field in new_cafe:
             new_cafe[field] = getattr(add_cafe_form, field).data
         DatabaseManager.insert(new_cafe, db=db)
-        print([v for v in new_cafe.values()])
+        return redirect('/')
     return render_template("add.html", form=add_cafe_form, cafe_data = new_cafe)
 
 @app.route('/delete')

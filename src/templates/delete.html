@@ -1,2 +1,15 @@
 {% include "header.html" %}
+<h2> Choose which cafe to delete: </h2>
+<div id="selector">
+    <form method="post">
+        {{ form.csrf_token }}
+    <select name="cafe_id_to_delete" id="cafe-select">
+        {% for row in data %}
+        <option value={{ row.id }}>{{ row.name }}</option>
+        {% endfor %}
+
+    </select>
+    {{ form.submit }}
+    </form>
+</div>
 {% include "footer.html" %}

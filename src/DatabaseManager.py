@@ -30,26 +30,28 @@ def query_db(query, args=(), one=False):
     cur = get_db().execute(query, args)
     rv = cur.fetchall()
     cur.close()
-    return (rv[0] if rv else none) if one else rv
+    return (rv[0] if rv else None) if one else rv
 
-def build_query(column='*', condition:str='')-> str:
+def get_all_cafes() -> list[str] | None:
+    return query_db("SELECT * FROM cafe")
+
+def build_query(column='*')-> str:
     if column not in ["id"] + COLUMNS:
         raise ValueError("Invalid column provided.")
     query = f"SELECT {column} from cafes"
     return query
 
-def insert(row: dict, db: sqlite3.Connection, table: str="cafe") -> None:
-    initial_rows = query_db("SELECT Count(*) FROM cafe")[0]
-    print(initial_rows.keys())
+def insert(row: dict, db: sqlite3.Connection) -> None:
+    initial_rows = query_db("SELECT Count(*) FROM cafe")
+    if initial_rows is not None:
+        count = initial_rows[0]
     c = db.cursor()
     statement = f'insert into cafe values ({"?, "*len(row) +"?"})'
-    c.execute(statement, [initial_rows[0]+1] + [r for r in row.values()]
+    c.execute(statement, [count[0]+1] + [r for r in row.values()]
                )
     db.commit()
     db.close()
-    
-    pass
 
-def remove(id: int, table: str, db: sqlite3.Connection) -> None:
-    db.execute('delete from cafe where id = 30')
+def remove(id: int, db: sqlite3.Connection) -> None:
+    db.execute(f'delete from cafe where id = {id}')
     db.commit()

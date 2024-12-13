@@ -1,0 +1,8 @@
+<form method="post">
+    
+    {{ form.csrf_token }}
+    {% for field in form if field.id != "csrf_token" %}
+        {{ field.label }} {{ field }}
+    {% endfor %}
+
+</form>

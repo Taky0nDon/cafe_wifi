@@ -1,9 +1,16 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField
+from wtforms import PasswordField, StringField, SubmitField, validators
 from wtforms.fields.choices import SelectField
 from wtforms.validators import DataRequired
 
 from DatabaseManager import get_all_cafes
+
+class LoginForm(FlaskForm):
+    username = StringField("Username: ",
+                           validators=[DataRequired()])
+    password = PasswordField("Password: ",
+                             validators=[DataRequired()])
+    submit = SubmitField("Login")
 
 class AddCafeForm(FlaskForm):
     name = StringField("Name: ",

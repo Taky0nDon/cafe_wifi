@@ -1,12 +1,12 @@
 from secrets import token_urlsafe
 
 import werkzeug
-from flask import Flask, g, redirect, render_template, Response
+from flask import Flask, g, redirect, render_template, request
 from flask_wtf import CSRFProtect
 
-from DatabaseManager import get_db, query_db, build_query
+from DatabaseManager import get_db, query_db, get_all_cafes, remove
 import DatabaseManager
-from forms import AddCafeForm
+from forms import AddCafeForm, DeleteCafeForm
 
 PROPERTIES = [
                 "has_sockets",
@@ -46,16 +46,12 @@ def close_connection(exception):
 
 @app.route('/')
 def home() -> str:
-    all_rows = query_db("select * from cafe")
-    for row in all_rows:
-        print(row)
-        for field in row:
-            print(field)
+    all_rows = get_all_cafes()
     return render_template("index.html", rows=all_rows)
 
 @app.route('/cafe/<int:cafe_id>')
 def cafe(cafe_id: int) -> str:
-    particular_cafe = query_db(f"select * from cafe where id=={cafe_id}")[0]
+    particular_cafe = query_db(f"SELECT * FROM cafe WHERE id = {cafe_id}")[0]
     return render_template("cafe.html", this_cafe=particular_cafe)
 
 @app.route('/add', methods=["GET", "POST"])
@@ -69,6 +65,17 @@ def add_page() -> str | werkzeug.wrappers.response.Response:
         return redirect('/')
     return render_template("add.html", form=add_cafe_form, cafe_data = new_cafe)
 
-@app.route('/delete')
-def delete_page() -> str:
-    return render_template("delete.html")
+@app.route('/delete', methods=["GET", "POST"])
+def delete_page() -> str | werkzeug.Response:
+    delete_cafe_form = DeleteCafeForm()
+    current_cafes = get_all_cafes()
+    if request.method == "POST":
+        print("posting")
+        cafe_id = request.form.get("cafe_id_to_delete")
+        if cafe_id is not None:
+            cafe_id = int(cafe_id)
+            remove(cafe_id, db)
+        return redirect("/")
+    else:
+        print("method", request.method)
+    return render_template("delete.html", form=delete_cafe_form, data=current_cafes)

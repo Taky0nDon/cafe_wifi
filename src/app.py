@@ -4,6 +4,7 @@ import werkzeug
 from flask import Flask, g, redirect, render_template, request
 from flask_wtf import CSRFProtect
 
+from auth import auth as auth_blueprint
 from DatabaseManager import get_db, query_db, get_all_cafes, remove
 import DatabaseManager
 from forms import AddCafeForm, DeleteCafeForm
@@ -32,6 +33,8 @@ new_cafe = {
 
 
 app = Flask(__name__)
+app.register_blueprint(auth_blueprint)
+
 app.secret_key = token_urlsafe(16)
 csrf = CSRFProtect(app)
 

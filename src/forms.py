@@ -1,6 +1,9 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
+from wtforms.fields.choices import SelectField
 from wtforms.validators import DataRequired
+
+from DatabaseManager import get_all_cafes
 
 class AddCafeForm(FlaskForm):
     name = StringField("Name: ",
@@ -34,3 +37,7 @@ class AddCafeForm(FlaskForm):
                             validators=[DataRequired()]
                               )
     submit = SubmitField("Add Cafe")
+
+class DeleteCafeForm(FlaskForm):
+    cafe_name = SelectField()
+    submit = SubmitField("Remove this cafe")

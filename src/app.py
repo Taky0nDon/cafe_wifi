@@ -1,24 +1,72 @@
 from secrets import token_urlsafe
+from functools import wraps
 
 import werkzeug
+import flask_login
 from flask import Flask, g, redirect, render_template, request
 from flask_wtf import CSRFProtect
 
-from auth import auth as auth_blueprint
+from auth import auth as auth_blueprint, login, admin_only 
 from DatabaseManager import get_db, query_db, get_all_cafes, remove
 import DatabaseManager
 from forms import AddCafeForm, DeleteCafeForm
+from UserManager import get_users, User
 
-PROPERTIES = [
-                "has_sockets",
-                "has_toilet",
-                "has_wifi",
-                "cake_take_calls",
-                "seats",
-                "coffee_price"
-             ]
+app = Flask(__name__)
+app.secret_key = token_urlsafe(16)
+csrf = CSRFProtect(app)
 
-new_cafe = {
+login_manager = flask_login.LoginManager()
+login_manager.init_app(app)
+
+app.register_blueprint(auth_blueprint)
+with app.app_context():
+    db = get_db()
+
+users = get_users()
+
+@login_manager.user_loader
+def user_loader(username):
+    if username not in users:
+        return
+    user = User()
+    user.id = username
+    return user
+
+
+@login_manager.request_loader
+def request_loader(request):
+    username = request.form.get('username')
+    if username not in users:
+        return
+
+    user = User()
+    user.id = username
+    return user
+
+
+@app.teardown_appcontext
+def close_connection(exception):
+    db = getattr(g, "_database", None)
+    if db is not None:
+        db.close()
+
+
+@app.route("/")
+def home() -> str:
+    all_rows = get_all_cafes()
+    return render_template("index.html", rows=all_rows)
+
+
+@app.route("/cafe/<int:cafe_id>")
+def cafe(cafe_id: int) -> str:
+    particular_cafe = query_db(f"SELECT * FROM cafe WHERE id = {cafe_id}")[0]
+    return render_template("cafe.html", this_cafe=particular_cafe)
+
+
+@app.route("/add", methods=["GET", "POST"])
+def add_page() -> str | werkzeug.wrappers.response.Response:
+    new_cafe = {
         "name": None,
         "map_url": None,
         "img_url": None,
@@ -29,46 +77,18 @@ new_cafe = {
         "can_take_calls": None,
         "seats": None,
         "coffee_price": None,
-        }
-
-
-app = Flask(__name__)
-app.register_blueprint(auth_blueprint)
-
-app.secret_key = token_urlsafe(16)
-csrf = CSRFProtect(app)
-
-with app.app_context():
-    db = get_db()
-
-@app.teardown_appcontext
-def close_connection(exception):
-    db = getattr(g, '_database', None)
-    if db is not None:
-        db.close()
-
-@app.route('/')
-def home() -> str:
-    all_rows = get_all_cafes()
-    return render_template("index.html", rows=all_rows)
-
-@app.route('/cafe/<int:cafe_id>')
-def cafe(cafe_id: int) -> str:
-    particular_cafe = query_db(f"SELECT * FROM cafe WHERE id = {cafe_id}")[0]
-    return render_template("cafe.html", this_cafe=particular_cafe)
-
-@app.route('/add', methods=["GET", "POST"])
-def add_page() -> str | werkzeug.wrappers.response.Response:
+    }
     add_cafe_form = AddCafeForm()
     print(dir(add_cafe_form))
     if add_cafe_form.validate_on_submit():
         for field in new_cafe:
             new_cafe[field] = getattr(add_cafe_form, field).data
         DatabaseManager.insert(new_cafe, db=db)
-        return redirect('/')
-    return render_template("add.html", form=add_cafe_form, cafe_data = new_cafe)
+        return redirect("/")
+    return render_template("add.html", form=add_cafe_form, cafe_data=new_cafe)
 
-@app.route('/delete', methods=["GET", "POST"])
+
+@app.route("/delete", methods=["GET", "POST"])
 def delete_page() -> str | werkzeug.Response:
     delete_cafe_form = DeleteCafeForm()
     current_cafes = get_all_cafes()
@@ -82,3 +102,8 @@ def delete_page() -> str | werkzeug.Response:
     else:
         print("method", request.method)
     return render_template("delete.html", form=delete_cafe_form, data=current_cafes)
+
+@app.route('/admin-welcome')
+@admin_only
+def admin_welcome():
+    return render_template("admin-welcome.html")

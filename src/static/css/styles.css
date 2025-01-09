@@ -23,6 +23,11 @@ img {
     justify-content: center;
 }
 
+.empty-div:after {
+    content: '.';
+    visibility: hidden;
+}
+
 .text {
     text-align: center;
 }

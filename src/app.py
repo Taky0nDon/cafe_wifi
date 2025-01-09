@@ -10,7 +10,7 @@ from auth import auth as auth_blueprint, login, admin_only
 from DatabaseManager import get_db, query_db, get_all_cafes, remove
 import DatabaseManager
 from forms import AddCafeForm, DeleteCafeForm
-from UserManager import get_users, User
+from UserManager import get_users, User, user_is_admin
 
 app = Flask(__name__)
 app.secret_key = token_urlsafe(16)
@@ -29,8 +29,12 @@ users = get_users()
 def user_loader(username):
     if username not in users:
         return
+    print(f"Creating a user object in user_loader")
     user = User()
+    user.index = users[username]["id"]
     user.id = username
+    if user_is_admin(user):
+        user.is_admin = True
     return user
 
 
@@ -39,7 +43,7 @@ def request_loader(request):
     username = request.form.get('username')
     if username not in users:
         return
-
+    print(f"Creating a User object in request_loader")
     user = User()
     user.id = username
     return user

@@ -1,3 +1,7 @@
 {% include "header.html" %}
-<h2>WELCOME ADMIN</h2>
+<div class="text">
+    <h2>WELCOME ADMIN</h2>
+    <a href="{{ url_for('add_page') }}">Add a cafe</a>
+    <a href="{{ url_for('delete_page') }}">Remove a cafe</a>
+</div>
 {% include "footer.html" %}

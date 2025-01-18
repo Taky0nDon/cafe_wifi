@@ -37,6 +37,14 @@ img {
     text-align: center;
 }
 
+.form-input {
+    align-self: center;
+    width: 50%;
+    margin-right: 25%;
+    padding: 8px;
+    box-sizing: border-box;
+    }
+
 .table {
     display: flex;
     flex-direction: column;

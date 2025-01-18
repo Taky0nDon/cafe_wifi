@@ -9,11 +9,12 @@ allows users to add and delete cafes.
 
 ## TODOS
 
-1. Add users/auth
-2. Let users add cafes
-3. Let users remove cafes
-4. Nav bar
-1. Line up /cafe columns, with properties on the left and their values on the right
+- When users submit a cafe, it sends an email to the admin.
+- Add users/auth
+- Let users add cafes
+- Let users remove cafes
+- Nav bar
+- Line up /cafe columns, with properties on the left and their values on the right
 
 1. When you click a link on the index page, it should bring you to the /cafe page
 for the cafe you clicked, with details about that cafe.
@@ -36,3 +37,5 @@ for the cafe you clicked, with details about that cafe.
 ```
 "id", "name", "map_url", "img_url", "location", "has_sockets", "has_toilet", "has_wifi", "can_take_calls", "seats","coffee_price" 
 
+## Protip for finding the gmail app password setting:
+https://myaccount.google.com/apppasswords

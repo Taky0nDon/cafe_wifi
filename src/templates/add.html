@@ -1,9 +1,10 @@
 {% include "header.html" %}
-<h2> Add a Cafe </h2>
-<form method="post"> 
+<h2 class="text"> Add a Cafe </h2>
+<form method="post" class="table text form-input"> 
 {{ form.csrf_token }}
 {% for field in form if field.id != "csrf_token" %}
 {{ field.label }} {{ field }}
+<br>
 {% endfor %}
 </form>
 {% include "footer.html" %}

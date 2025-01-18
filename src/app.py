@@ -1,16 +1,26 @@
 from secrets import token_urlsafe
 from functools import wraps
+from os import environ
 
 import werkzeug
 import flask_login
 from flask import Flask, g, redirect, render_template, request
 from flask_wtf import CSRFProtect
+from dotenv import load_dotenv
 
 from auth import auth as auth_blueprint, login, admin_only 
 from DatabaseManager import get_db, query_db, get_all_cafes, remove
 import DatabaseManager
 from forms import AddCafeForm, DeleteCafeForm
 from UserManager import get_users, User, user_is_admin
+from MailHandler import send_cafe_request_email, Message
+
+load_dotenv(".env")
+PW = environ["PW"]
+EMAIL = environ["EMAIL"]
+SERVER = environ["SERVER"]
+test_message = Message("Hello world", "Please add my cafe to your website").message
+
 
 app = Flask(__name__)
 app.secret_key = token_urlsafe(16)
@@ -88,6 +98,11 @@ def add_page() -> str | werkzeug.wrappers.response.Response:
         for field in new_cafe:
             new_cafe[field] = getattr(add_cafe_form, field).data
         DatabaseManager.insert(new_cafe, db=db)
+        send_cafe_request_email(smtp_server=SERVER,
+                                email_address=EMAIL,
+                                sender_auth=PW,
+                                message=test_message+"sent from the site"
+                                )
         return redirect("/")
     return render_template("add.html", form=add_cafe_form, cafe_data=new_cafe)
 

@@ -1,6 +1,7 @@
 from secrets import token_urlsafe
 from os import environ
 
+import flask_wtf
 import werkzeug
 import flask_login
 from flask import Flask, g, redirect, render_template, request
@@ -95,12 +96,15 @@ def add_page() -> str | werkzeug.wrappers.response.Response:
     if add_cafe_form.validate_on_submit():
         for field in new_cafe:
             new_cafe[field] = getattr(add_cafe_form, field).data
-        DatabaseManager.insert(new_cafe, db=db)
-        send_cafe_request_email(smtp_server=SERVER,
-                                email_address=EMAIL,
-                                sender_auth=PW,
-                                message=test_message+"sent from the site"+"\n" + str(new_cafe)
-                                )
+
+        if flask_login.current_user.is_authenticated and user_is_admin(flask_login.current_user):
+            DatabaseManager.insert(new_cafe, db=db)
+        else:
+            send_cafe_request_email(smtp_server=SERVER,
+                                    email_address=EMAIL,
+                                    sender_auth=PW,
+                                    message=test_message+"sent from the site"+"\n" + str(new_cafe)
+                                    )
         return redirect("/")
     return render_template("add.html", form=add_cafe_form, cafe_data=new_cafe)
 

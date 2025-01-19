@@ -1,5 +1,4 @@
 from secrets import token_urlsafe
-from functools import wraps
 from os import environ
 
 import werkzeug
@@ -8,7 +7,7 @@ from flask import Flask, g, redirect, render_template, request
 from flask_wtf import CSRFProtect
 from dotenv import load_dotenv
 
-from auth import auth as auth_blueprint, login, admin_only 
+from auth import auth as auth_blueprint, admin_only 
 from DatabaseManager import get_db, query_db, get_all_cafes, remove
 import DatabaseManager
 from forms import AddCafeForm, DeleteCafeForm
@@ -93,7 +92,6 @@ def add_page() -> str | werkzeug.wrappers.response.Response:
         "coffee_price": None,
     }
     add_cafe_form = AddCafeForm()
-    print(dir(add_cafe_form))
     if add_cafe_form.validate_on_submit():
         for field in new_cafe:
             new_cafe[field] = getattr(add_cafe_form, field).data
@@ -101,7 +99,7 @@ def add_page() -> str | werkzeug.wrappers.response.Response:
         send_cafe_request_email(smtp_server=SERVER,
                                 email_address=EMAIL,
                                 sender_auth=PW,
-                                message=test_message+"sent from the site"
+                                message=test_message+"sent from the site"+"\n" + str(new_cafe)
                                 )
         return redirect("/")
     return render_template("add.html", form=add_cafe_form, cafe_data=new_cafe)

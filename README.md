@@ -39,3 +39,26 @@ for the cafe you clicked, with details about that cafe.
 
 ## Protip for finding the gmail app password setting:
 https://myaccount.google.com/apppasswords
+
+## Go from string representation of dictionary back to dictionary
+```
+>>> dict_str =  "{'name': 'wake forest coffee', 'map_url': 'n/a', 'img_url': 'n/a', 'location': 'wake forest nc', 'has_sockets': 'Y', 'has_toilet': 'Y', 'has_wifi': 'Y', 'can_take_calls': 'Y', 'seats': '24', 'coffee_price': '$4'}"
+>>> dict(dict_str)
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+ValueError: dictionary update sequence element #0 has length 1; 2 is required
+>>> dict_str.split(",").strip("{}")
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+AttributeError: 'list' object has no attribute 'strip'
+>>> dict_str.strip("{}").split(",")
+["'name': 'wake forest coffee'", " 'map_url': 'n/a'", " 'img_url': 'n/a'", " 'location': 'wake forest nc'", " 'has_sockets': 'Y'", " 'has_toilet': 'Y'", " 'has_wifi': 'Y'", " 'can_take_calls': 'Y'", " 'seats': '24'", " 'coffee_price': '$4'"]
+>>> kv_pairs = dict_str.strip("{}").split(",")
+>>> kv_pairs = [tuple(_.split(":")) for _ in kv_pairs]
+>>> kv_pairs
+[("'name'", " 'wake forest coffee'"), (" 'map_url'", " 'n/a'"), (" 'img_url'", " 'n/a'"), (" 'location'", " 'wake forest nc'"), (" 'has_sockets'", " 'Y'"), (" 'has_toilet'", " 'Y'"), (" 'has_wifi'", " 'Y'"), (" 'can_take_calls'", " 'Y'"), (" 'seats'", " '24'"), (" 'coffee_price'", " '$4'")]
+>>> new_dict = {k:v for (k,v) in kv_pairs}
+>>> new_dict
+{"'name'": " 'wake forest coffee'", " 'map_url'": " 'n/a'", " 'img_url'": " 'n/a'", " 'location'": " 'wake forest nc'", " 'has_sockets'": " 'Y'", " 'has_toilet'": " 'Y'", " 'has_wifi'": " 'Y'", " 'can_take_calls'": " 'Y'", " 'seats'": " '24'", " 'coffee_price'": " '$4'"}
+>>>
+```

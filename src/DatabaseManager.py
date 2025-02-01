@@ -41,12 +41,12 @@ def build_query(column='*')-> str:
     query = f"SELECT {column} from cafes"
     return query
 
-def insert(row: dict, db: sqlite3.Connection) -> None:
-    initial_rows = query_db("SELECT Count(*) FROM cafe")
+def insert(row: dict, db: sqlite3.Connection, table: str="cafe") -> None:
+    initial_rows = query_db(f"SELECT Count(*) FROM {table}")
     if initial_rows is not None:
         count = initial_rows[0]
     c = db.cursor()
-    statement = f'insert into cafe values ({"?, "*len(row) +"?"})'
+    statement = f'insert into {table} values ({"?, "*len(row) +"?"})'
     c.execute(statement, [count[0]+1] + [r for r in row.values()]
                )
     db.commit()

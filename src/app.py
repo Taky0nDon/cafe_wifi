@@ -13,7 +13,7 @@ from DatabaseManager import get_db, query_db, get_all_cafes, remove
 import DatabaseManager
 from forms import AddCafeForm, DeleteCafeForm
 from UserManager import get_users, User, user_is_admin
-from MailHandler import send_cafe_request_email, Message
+from MailHandler import submit_request, Message
 
 load_dotenv(".env")
 PW = environ["PW"]
@@ -91,6 +91,7 @@ def add_page() -> str | werkzeug.wrappers.response.Response:
         "can_take_calls": None,
         "seats": None,
         "coffee_price": None,
+        "submitted_by_id": "666"
     }
     add_cafe_form = AddCafeForm()
     if add_cafe_form.validate_on_submit():
@@ -100,13 +101,16 @@ def add_page() -> str | werkzeug.wrappers.response.Response:
         if flask_login.current_user.is_authenticated and user_is_admin(flask_login.current_user):
             DatabaseManager.insert(new_cafe, db=db)
         else:
-            send_cafe_request_email(smtp_server=SERVER,
-                                    email_address=EMAIL,
-                                    sender_auth=PW,
-                                    message=test_message+"sent from the site"+"\n" + str(new_cafe)
-                                    )
+            DatabaseManager.insert(new_cafe, db=db, table="submission")
         return redirect("/")
     return render_template("add.html", form=add_cafe_form, cafe_data=new_cafe)
+
+
+#TODO: submitted by string is not being inserted into table
+@app.route("/view-pending", methods=["GET"])
+def view_pending_submissions() -> str:
+    pending_cafes = query_db("select * from submission")
+    return render_template("pending.html", submitted_cafes=pending_cafes)
 
 
 @app.route("/delete", methods=["GET", "POST"])

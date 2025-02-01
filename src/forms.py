@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import PasswordField, StringField, SubmitField, validators
+from wtforms import HiddenField, PasswordField, StringField, SubmitField, validators
 from wtforms.fields.choices import SelectField
 from wtforms.validators import DataRequired
 
@@ -44,6 +44,7 @@ class AddCafeForm(FlaskForm):
                             validators=[DataRequired()]
                               )
     submit = SubmitField("Add Cafe")
+    submitted_by_id = HiddenField("placeholder")
 
 class DeleteCafeForm(FlaskForm):
     cafe_name = SelectField()

@@ -1,26 +1,15 @@
 from secrets import token_urlsafe
-from os import environ
 
-import flask_wtf
 import werkzeug
 import flask_login
 from flask import Flask, g, redirect, render_template, request
 from flask_wtf import CSRFProtect
-from dotenv import load_dotenv
 
 from auth import auth as auth_blueprint, admin_only 
 from DatabaseManager import get_db, query_db, get_all_cafes, remove
 import DatabaseManager
 from forms import AddCafeForm, DeleteCafeForm
 from UserManager import get_users, User, user_is_admin
-from MailHandler import submit_request, Message
-
-load_dotenv(".env")
-PW = environ["PW"]
-EMAIL = environ["EMAIL"]
-SERVER = environ["SERVER"]
-test_message = Message("Hello world", "Please add my cafe to your website").message
-
 
 app = Flask(__name__)
 app.secret_key = token_urlsafe(16)
@@ -33,13 +22,12 @@ app.register_blueprint(auth_blueprint)
 with app.app_context():
     db = get_db()
 
-users = get_users()
 
 @login_manager.user_loader
-def user_loader(username):
+def user_loader(username) -> User | str:
+    users = get_users()
     if username not in users:
-        return
-    print(f"Creating a user object in user_loader")
+        return "User not found."
     user = User()
     user.index = users[username]["id"]
     user.id = username
@@ -49,10 +37,11 @@ def user_loader(username):
 
 
 @login_manager.request_loader
-def request_loader(request):
+def request_loader(request) -> User | str:
+    users = get_users()
     username = request.form.get('username')
     if username not in users:
-        return
+        return "User not found."
     print(f"Creating a User object in request_loader")
     user = User()
     user.id = username
@@ -64,6 +53,7 @@ def close_connection(exception):
     db = getattr(g, "_database", None)
     if db is not None:
         db.close()
+    raise exception
 
 
 @app.route("/")
@@ -74,8 +64,11 @@ def home() -> str:
 
 @app.route("/cafe/<int:cafe_id>")
 def cafe(cafe_id: int) -> str:
-    particular_cafe = query_db(f"SELECT * FROM cafe WHERE id = {cafe_id}")[0]
-    return render_template("cafe.html", this_cafe=particular_cafe)
+    results = query_db(f"SELECT * FROM cafe WHERE id = {cafe_id}")
+    if results is None:
+        return "Error: No page exists for this cafe."
+    cafe_object = results[0]
+    return render_template("cafe.html", this_cafe=cafe_object)
 
 
 @app.route("/add", methods=["GET", "POST"])
@@ -91,17 +84,19 @@ def add_page() -> str | werkzeug.wrappers.response.Response:
         "can_take_calls": None,
         "seats": None,
         "coffee_price": None,
-        "submitted_by_id": "666"
+        "submitted_by_id": 0
     }
     add_cafe_form = AddCafeForm()
     if add_cafe_form.validate_on_submit():
         for field in new_cafe:
             new_cafe[field] = getattr(add_cafe_form, field).data
 
-        if flask_login.current_user.is_authenticated and user_is_admin(flask_login.current_user):
+        if  and user_is_admin(flask_login.current_user):
             DatabaseManager.insert(new_cafe, db=db)
-        else:
+        elif flask_login.current_user.is_authenticated:
             DatabaseManager.insert(new_cafe, db=db, table="submission")
+        else:
+            return "You must register an account in order to submit a cafe!"
         return redirect("/")
     return render_template("add.html", form=add_cafe_form, cafe_data=new_cafe)
 

@@ -53,7 +53,6 @@ def close_connection(exception):
     db = getattr(g, "_database", None)
     if db is not None:
         db.close()
-    raise exception
 
 
 @app.route("/")
@@ -91,7 +90,7 @@ def add_page() -> str | werkzeug.wrappers.response.Response:
         for field in new_cafe:
             new_cafe[field] = getattr(add_cafe_form, field).data
 
-        if  and user_is_admin(flask_login.current_user):
+        if  user_is_admin(flask_login.current_user):
             DatabaseManager.insert(new_cafe, db=db)
         elif flask_login.current_user.is_authenticated:
             DatabaseManager.insert(new_cafe, db=db, table="submission")

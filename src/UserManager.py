@@ -1,3 +1,4 @@
+from flask_login.utils import LocalProxy
 from DatabaseManager import query_db, get_db
 from flask import Flask
 from flask_login import UserMixin
@@ -7,6 +8,7 @@ class User(UserMixin):
     def __init__(self):
         self.is_admin = False
         self.index = None
+        self.id: str
 
 app = Flask("app")
 USER_DB_PATH = "/home/mike/code/100_days_of_code/final_projects/cafe_wifi/data/cafes.db"
@@ -16,7 +18,8 @@ with app.app_context():
     user_rows = query_db("SELECT * FROM user")
 
 def get_users() -> dict:
-    print(f"{user_rows=}")
+    if user_rows is None:
+        raise ValueError("No users found")
     users = {row["username"]: {key:row[key] for key in row.keys()} for row in user_rows
             }
 
@@ -25,7 +28,7 @@ def get_users() -> dict:
     else:
         return {}
 
-def user_is_admin(user: User) -> bool:
+def user_is_admin(user: User | LocalProxy) -> bool:
     if user.index == 0:
         return True
     return False

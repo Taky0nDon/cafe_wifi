@@ -12,6 +12,11 @@ class LoginForm(FlaskForm):
                              validators=[DataRequired()])
     submit = SubmitField("Login")
 
+
+class RegisterForm(LoginForm):
+    submit = SubmitField("Sign up")
+
+
 class AddCafeForm(FlaskForm):
     name = StringField("Name: ",
                             validators=[DataRequired()]

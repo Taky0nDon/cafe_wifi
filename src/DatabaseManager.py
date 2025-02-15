@@ -45,11 +45,13 @@ def insert(row: dict, db: sqlite3.Connection, table: str="cafe") -> None:
     initial_rows = query_db(f"SELECT Count(*) FROM {table}")
     count = 0
     if initial_rows is not None:
-        count = initial_rows[0]
+        count = initial_rows[0][0] + 1
     c = db.cursor()
-    params = str("?, "*len(row)).rstrip(", ")
+    params = str("?, "*(len(row)+1)).rstrip(", ")
     statement = f'insert into {table} values ({params})'
-    c.execute(statement, [r for r in row.values()]
+    print(count)
+    print(list(_ for _ in row.items()))
+    c.execute(statement, [count] + [r for r in row.values()]
                )
     db.commit()
     db.close()

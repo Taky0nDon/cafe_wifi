@@ -43,15 +43,15 @@ def build_query(column='*')-> str:
 
 def insert(row: dict, db: sqlite3.Connection, table: str="cafe") -> None:
     initial_rows = query_db(f"SELECT Count(*) FROM {table}")
-    count = 0
+    id = 0
     if initial_rows is not None:
-        count = initial_rows[0][0] + 1
+        id = initial_rows[0][0] + 1
     c = db.cursor()
     params = str("?, "*(len(row)+1)).rstrip(", ")
     statement = f'insert into {table} values ({params})'
-    print(count)
+    print(id)
     print(list(_ for _ in row.items()))
-    c.execute(statement, [count] + [r for r in row.values()]
+    c.execute(statement, [id] + [r for r in row.values()]
                )
     db.commit()
     db.close()

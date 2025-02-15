@@ -3,7 +3,7 @@ from flask import Blueprint, render_template, request, Flask, g, request, redire
 from functools import wraps
 
 
-from forms import LoginForm
+from forms import LoginForm, RegisterForm
 from DatabaseManager import get_db, insert
 from UserManager import get_users, User, user_is_admin
 
@@ -35,7 +35,7 @@ def login():
         username = request.form["username"]
         users = get_users()
         print(users)
-        if username in users and request.form["password"] == users[username]["pw_hash"]:
+        if username in users and request.form["password"] == users[username]["password"]:
             flask_login.login_user(create_user_object(username))
             return redirect(url_for("admin_welcome"))
         return "BAD LOGIN"
@@ -43,7 +43,7 @@ def login():
 
 @auth.route('/register', methods=['GET', 'POST'])
 def register_user():
-    registration_form = LoginForm()
+    registration_form = RegisterForm()
     if request.method == 'POST':
         username = request.form['username']
         if  username in get_users():
@@ -57,4 +57,4 @@ def register_user():
         flask_login.login_user(new_user)
         insert(user_dict, db=db, table='user')
 
-    return render_template("register.html")
+    return render_template("login.html", form=registration_form)

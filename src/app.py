@@ -83,7 +83,6 @@ def add_page() -> str | werkzeug.wrappers.response.Response:
         "can_take_calls": None,
         "seats": None,
         "coffee_price": None,
-        "submitted_by_id": 0
     }
     add_cafe_form = AddCafeForm()
     if add_cafe_form.validate_on_submit():
@@ -92,18 +91,19 @@ def add_page() -> str | werkzeug.wrappers.response.Response:
 
         if  user_is_admin(flask_login.current_user):
             DatabaseManager.insert(new_cafe, db=db)
-        elif flask_login.current_user.is_authenticated:
-            DatabaseManager.insert(new_cafe, db=db, table="submission")
         else:
-            return "You must register an account in order to submit a cafe!"
+            return "Only admins can add to the db right now, we are working\
+                   on Getting it to work for users"
         return redirect("/")
     return render_template("add.html", form=add_cafe_form, cafe_data=new_cafe)
 
 
 #TODO: submitted by string is not being inserted into table
-@app.route("/view-pending", methods=["GET"])
+@app.route("/view-pending", methods=["GET", "POST"])
 def view_pending_submissions() -> str:
     pending_cafes = query_db("select * from submission")
+    if request.method == "POST":
+        pass
     return render_template("pending.html", submitted_cafes=pending_cafes)
 
 

@@ -4,7 +4,7 @@ from functools import wraps
 
 
 from forms import LoginForm, RegisterForm
-from DatabaseManager import get_db, insert
+from DatabaseManager import get_db, insert, query_db
 from UserManager import get_users, User, user_is_admin
 
 auth = Blueprint('auth', __name__)
@@ -46,11 +46,12 @@ def register_user():
     registration_form = RegisterForm()
     if request.method == 'POST':
         username = request.form['username']
-        if  username in get_users():
+        name_check = query_db("select * from user where username==?",
+                     args=[username])
+        if  name_check:
             return "That name is not available."
         new_user = create_user_object(username)
         user_dict = {
-               'id': len(get_users()) or 0,
                'username': request.form['username'],
                'password': request.form['password']
                 }

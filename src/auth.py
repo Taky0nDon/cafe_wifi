@@ -3,6 +3,7 @@ from flask import Blueprint, render_template, request, Flask, g, request, redire
 from functools import wraps
 
 
+import DatabaseManager
 from forms import LoginForm, RegisterForm
 from DatabaseManager import get_db, insert, query_db
 from UserManager import get_users, User, user_is_admin
@@ -15,6 +16,7 @@ with app.app_context():
 def admin_only(function):  # This is a decorator.
     @wraps(function)
     def view(*args, **kwargs):
+        print(f"{flask_login.current_user.is_admin=}")
         if flask_login.current_user.is_admin:
             return function(*args, **kwargs)
         else:
@@ -33,12 +35,18 @@ def login():
     login_form = LoginForm()
     if request.method == "POST":
         username = request.form["username"]
-        users = get_users()
-        print(users)
-        if username in users and request.form["password"] == users[username]["password"]:
-            flask_login.login_user(create_user_object(username))
+        user = User(DatabaseManager.query_db("select * from user where username=?;",
+                                        args=[username]))
+        print(f"{user.id=}")
+        print(user)
+        if not user.username or user.password != request.form["password"]:
+            return "BAD LOGIN"
+        if user.id == 0:
+            user.is_admin = True
+        flask_login.login_user(user)
+        if flask_login.current_user.is_admin:
             return redirect(url_for("admin_welcome"))
-        return "BAD LOGIN"
+        return f"thanks for logging in {user.username}"
     return render_template("login.html", form=login_form)
 
 @auth.route('/register', methods=['GET', 'POST'])

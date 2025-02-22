@@ -41,8 +41,6 @@ def login():
         print(user)
         if not user.username or user.password != request.form["password"]:
             return "BAD LOGIN"
-        if user.id == 0:
-            user.is_admin = True
         flask_login.login_user(user)
         if flask_login.current_user.is_admin:
             return redirect(url_for("admin_welcome"))

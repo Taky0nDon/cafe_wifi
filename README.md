@@ -9,7 +9,13 @@ allows users to add and delete cafes.
 
 ## TODOS
 
+- Make boolean fields of cafe submission not text input. Use button or something.
 - When users submit a cafe, it sends an email to the admin.
+- Create a "pending" database of user submitted cafes that can be approved by admin.
+    * All the same things that are in the cafe table, but also:
+        * submitted by (username / email?)
+        * submitted on (date)
+- When a pending cafe is accepted, remove it from the db
 - Add users/auth
 - Let users add cafes
 - Let users remove cafes
@@ -21,7 +27,7 @@ for the cafe you clicked, with details about that cafe.
     * Use cafe id in URL
 ]
 ## Table Structure:
-
+### Cafe
 ```
 0|id|INTEGER|0||1
 1|name|VARCHAR (250)|1||0
@@ -34,8 +40,35 @@ for the cafe you clicked, with details about that cafe.
 8|can_take_calls|BOOLEAN|1||0
 9|seats|VARCHAR (250)|0||0
 10|coffee_price|VARCHAR (250)|0||0
+11|submitted_by_id|INTEGER|1|0
 ```
-"id", "name", "map_url", "img_url", "location", "has_sockets", "has_toilet", "has_wifi", "can_take_calls", "seats","coffee_price" 
+"id", "name", "map_url", "img_url", "location", "has_sockets", "has_toilet",
+"has_wifi", "can_take_calls", "seats","coffee_price" 
+
+### User
+```
+0|id|INTEGER|0||1
+1|username|TEXT|1||0
+2|pw_hash|TEXT|1||0
+```
+* find user's submissions:
+`SELECT * FROM cafe WHERE submitted_by_id = <user_id>`
+
+### Submissions
+```
+0|id|INTEGER|0||1
+1|name|VARCHAR (250)|1||0
+2|map_url|VARCHAR (500)|1||0
+3|img_url|VARCHAR (500)|1||0
+4|location|VARCHAR (250)|1||0
+5|has_sockets|BOOLEAN|1||0
+6|has_toilet|BOOLEAN|1||0
+7|has_wifi|BOOLEAN|1||0
+8|can_take_calls|BOOLEAN|1||0
+9|seats|VARCHAR (250)|0||0
+10|coffee_price|VARCHAR (250)|0||0
+111|submitted_by_id|INTEGER|1|0
+```
 
 ## Protip for finding the gmail app password setting:
 https://myaccount.google.com/apppasswords

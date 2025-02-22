@@ -1,5 +1,6 @@
 from secrets import token_urlsafe
 
+import flask
 import werkzeug
 import flask_login
 from flask import Flask, g, redirect, render_template, request
@@ -8,7 +9,7 @@ from flask_wtf import CSRFProtect
 from auth import auth as auth_blueprint, admin_only 
 from DatabaseManager import get_db, query_db, get_all_cafes, remove
 import DatabaseManager
-from forms import AddCafeForm, DeleteCafeForm
+from forms import AddCafeForm, DeleteCafeForm, PendingCafeForm
 from UserManager import get_users, User, user_is_admin
 
 app = Flask(__name__)
@@ -24,28 +25,12 @@ with app.app_context():
 
 
 @login_manager.user_loader
-def user_loader(username) -> User | str:
-    users = get_users()
-    if username not in users:
+def user_loader(user_id: str) -> User:
+    user_row = DatabaseManager.query_db("select * from user where id=?;",
+                                        args=[user_id])
+    if user_row is None:
         return "User not found."
-    user = User()
-    user.index = users[username]["id"]
-    user.id = username
-    if user_is_admin(user):
-        user.is_admin = True
-    return user
-
-
-@login_manager.request_loader
-def request_loader(request) -> User | str:
-    users = get_users()
-    username = request.form.get('username')
-    if username not in users:
-        return "User not found."
-    print(f"Creating a User object in request_loader")
-    user = User()
-    user.id = username
-    return user
+    return User(user_row)
 
 
 @app.teardown_appcontext
@@ -72,6 +57,7 @@ def cafe(cafe_id: int) -> str:
 
 @app.route("/add", methods=["GET", "POST"])
 def add_page() -> str | werkzeug.wrappers.response.Response:
+    print(f"{flask_login.current_user}({type(flask_login.current_user)}")
     new_cafe = {
         "name": None,
         "map_url": None,
@@ -83,6 +69,7 @@ def add_page() -> str | werkzeug.wrappers.response.Response:
         "can_take_calls": None,
         "seats": None,
         "coffee_price": None,
+        "submitted_by_id": flask_login.current_user,
     }
     add_cafe_form = AddCafeForm()
     if add_cafe_form.validate_on_submit():
@@ -92,8 +79,7 @@ def add_page() -> str | werkzeug.wrappers.response.Response:
         if  user_is_admin(flask_login.current_user):
             DatabaseManager.insert(new_cafe, db=db)
         else:
-            return "Only admins can add to the db right now, we are working\
-                   on Getting it to work for users"
+            DatabaseManager.insert(new_cafe, db=db, table="submission")
         return redirect("/")
     return render_template("add.html", form=add_cafe_form, cafe_data=new_cafe)
 
@@ -101,10 +87,12 @@ def add_page() -> str | werkzeug.wrappers.response.Response:
 #TODO: submitted by string is not being inserted into table
 @app.route("/view-pending", methods=["GET", "POST"])
 def view_pending_submissions() -> str:
+    pending_cafe_form = PendingCafeForm
     pending_cafes = query_db("select * from submission")
     if request.method == "POST":
         pass
-    return render_template("pending.html", submitted_cafes=pending_cafes)
+    return render_template("pending.html", submitted_cafes=pending_cafes,
+                           form=pending_cafe_form)
 
 
 @app.route("/delete", methods=["GET", "POST"])
@@ -112,17 +100,18 @@ def delete_page() -> str | werkzeug.Response:
     delete_cafe_form = DeleteCafeForm()
     current_cafes = get_all_cafes()
     if request.method == "POST":
-        print("posting")
         cafe_id = request.form.get("cafe_id_to_delete")
         if cafe_id is not None:
             cafe_id = int(cafe_id)
             remove(cafe_id, db)
         return redirect("/")
-    else:
-        print("method", request.method)
     return render_template("delete.html", form=delete_cafe_form, data=current_cafes)
 
 @app.route('/admin-welcome')
 @admin_only
 def admin_welcome():
     return render_template("admin-welcome.html")
+
+@app.route('/whoami')
+def whoami():
+    return f"You are {flask_login.current_user.username}"

@@ -5,10 +5,13 @@ from flask_login import UserMixin
 
 
 class User(UserMixin):
-    def __init__(self):
-        self.is_admin = False
-        self.index = None
-        self.id: str
+    def __init__(self, user_row):
+        self.username = user_row[0]["username"]
+        self.password = user_row[0]["password"]
+        self.id = user_row[0]["id"]
+        self.is_admin = user_is_admin(self)
+    def get_id(self):
+        return str(self.id)
 
 app = Flask("app")
 USER_DB_PATH = "/home/mike/code/100_days_of_code/final_projects/cafe_wifi/data/cafes.db"
@@ -29,6 +32,6 @@ def get_users() -> dict:
         return {}
 
 def user_is_admin(user: User | LocalProxy) -> bool:
-    if user.index == 0:
+    if user.id == 0:
         return True
     return False

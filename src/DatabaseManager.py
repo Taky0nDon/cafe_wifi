@@ -1,6 +1,5 @@
 import sqlite3
 
-from pathlib import Path
 from flask import g
 
 DATABASE = '/home/mike/code/100_days_of_code/final_projects/cafe_wifi/data/cafes.db'
@@ -35,27 +34,20 @@ def query_db(query, args=(), one=False):
 def get_all_cafes() -> list[str] | None:
     return query_db("SELECT * FROM cafe")
 
-def build_query(column='*')-> str:
-    if column not in ["id"] + COLUMNS:
-        raise ValueError("Invalid column provided.")
-    query = f"SELECT {column} from cafes"
-    return query
-
 def insert(row: dict, db: sqlite3.Connection, table: str="cafe") -> None:
     initial_rows = query_db(f"SELECT Count(*) FROM {table}")
     id = 0
     if initial_rows is not None:
-        id = initial_rows[0][0] + 1
+        id = initial_rows[0][0]
     c = db.cursor()
     params = str("?, "*(len(row)+1)).rstrip(", ")
     statement = f'insert into {table} values ({params})'
-    print(id)
-    print(list(_ for _ in row.items()))
     c.execute(statement, [id] + [r for r in row.values()]
                )
     db.commit()
     db.close()
 
-def remove(id: int, db: sqlite3.Connection) -> None:
-    db.execute(f'delete from cafe where id = {id}')
+def remove(id: int, db: sqlite3.Connection, table="cafe") -> None:
+    db.execute(f'delete from {table} where id = {id}')
     db.commit()
+    db.close()

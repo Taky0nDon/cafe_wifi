@@ -6,7 +6,7 @@ from wtforms.validators import DataRequired
 class LoginForm(FlaskForm):
     username = StringField("Username: ", validators=[DataRequired()])
     password = PasswordField("Password: ", validators=[DataRequired()])
-    submit = SubmitField("Login")
+    submit = SubmitField(label="Login", name="submit")
 
 class RegisterForm(LoginForm):
     submit = SubmitField("Sign up")
@@ -23,12 +23,18 @@ class AddCafeForm(FlaskForm):
     can_take_calls = StringField("Calls (Y/N): ", validators=[DataRequired()])
     seats = StringField("Number of seats: ", validators=[DataRequired()])
     coffee_price = StringField("Coffee Price: ", validators=[DataRequired()])
-    submit = SubmitField("Add Cafe")
-    submitted_by_id = HiddenField("placeholder")
+    submit = SubmitField("Add Cafe", name="submit")
 
 class DeleteCafeForm(FlaskForm):
-    cafe_name = SelectField(label="Accept?", choices=[("Yes", "accept"), ("No", "reject")])
-    submit = SubmitField("Remove this cafe")
+    cafe_name = SelectField()
+    submit = SubmitField("Remove this cafe", name="submit")
 
 class PendingCafeForm(FlaskForm):
-    accept = RadioField()
+    choices = {
+                "accept": ["Accept"],
+                "reject": ["Reject"],
+                "postpone": ["Postpone"]
+               }
+    sub_id = HiddenField()
+    decision = RadioField(label="Decision: ", choices=(choices))
+    submit = SubmitField("Submit", name="submit")

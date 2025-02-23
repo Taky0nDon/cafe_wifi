@@ -1,5 +1,5 @@
 {% include "header.html" %}
-{% for this_cafe in submitted_cafes %}
+{% for this_cafe, this_form in cafe_forms %}
     <div class="cafe_page">
             <div id="submitted_by" class="cafe_child">
                 Cafe submitted by: {{ this_cafe.submitted_by_id }}
@@ -76,12 +76,13 @@
                     </div>
                 </div>
             </div>
-    </div>
     <form method="post">
-        {{ form.csrf_token }}
-        {% for field in form if field != "csrf_token" %}
-            {{ field.label }} {{ field }}
+        {{ this_form.hidden_tag() }}
+        {% for field in this_form if field.widget.input_type != "hidden" %}
+        {{ field.label }} {{ field }}
         {% endfor %}
     </form>
+
+    </div>
 {% endfor %}
 {% include "footer.html" %}

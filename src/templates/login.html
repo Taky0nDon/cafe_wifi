@@ -1,8 +1,12 @@
 <form method="post">
     
-    {{ form.csrf_token }}
-    {% for field in form if field.id != "csrf_token" %}
-        {{ field.label }} {{ field }}
+    {{ form.hidden_tag() }}
+    {% for field in form if field.widget.input_type != "hidden" %}
+        {% if field.name != "submit"  %}
+            {{ field.label }} {{ field }}
+        {% else %}
+            {{ field }}
+        {% endif %}
     {% endfor %}
 
 </form>

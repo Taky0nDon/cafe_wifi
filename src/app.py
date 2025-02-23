@@ -1,12 +1,11 @@
 from secrets import token_urlsafe
 
-import flask
 import werkzeug
 import flask_login
-from flask import Flask, g, redirect, render_template, request
+from flask import Flask, g, redirect, render_template, request, url_for
 from flask_wtf import CSRFProtect
 
-from auth import auth as auth_blueprint, admin_only 
+from auth import auth as auth_blueprint, admin_only
 from DatabaseManager import get_db, query_db, get_all_cafes, remove
 import DatabaseManager
 from forms import AddCafeForm, DeleteCafeForm, PendingCafeForm
@@ -26,10 +25,9 @@ with app.app_context():
 
 @login_manager.user_loader
 def user_loader(user_id: str) -> User:
-    user_row = DatabaseManager.query_db("select * from user where id=?;",
-                                        args=[user_id])
-    if user_row is None:
-        return "User not found."
+    user_row = DatabaseManager.query_db(
+        "select * from user where id=?;", args=[user_id]
+    )
     return User(user_row)
 
 
@@ -55,9 +53,9 @@ def cafe(cafe_id: int) -> str:
     return render_template("cafe.html", this_cafe=cafe_object)
 
 
+
 @app.route("/add", methods=["GET", "POST"])
 def add_page() -> str | werkzeug.wrappers.response.Response:
-    print(f"{flask_login.current_user}({type(flask_login.current_user)}")
     new_cafe = {
         "name": None,
         "map_url": None,
@@ -76,23 +74,41 @@ def add_page() -> str | werkzeug.wrappers.response.Response:
         for field in new_cafe:
             new_cafe[field] = getattr(add_cafe_form, field).data
 
-        if  user_is_admin(flask_login.current_user):
+        if user_is_admin(flask_login.current_user):
             DatabaseManager.insert(new_cafe, db=db)
         else:
             DatabaseManager.insert(new_cafe, db=db, table="submission")
         return redirect("/")
     return render_template("add.html", form=add_cafe_form, cafe_data=new_cafe)
 
+# TODO: Make sure cafe info is passed along with decision
+@app.route("/view-pending", methods=["POST"])
+def view_pending_submissions_post():
+    action = request.form.get("decision")
+    print(request.form)
+    print(request.form.get("sub_id"))
+    match action:
+        case "accept":
+            pass
+        case "reject":
+            pass
+        case "postpone":
+            pass
+    return redirect(url_for("home"))
 
-#TODO: submitted by string is not being inserted into table
-@app.route("/view-pending", methods=["GET", "POST"])
+
+# TODO: submitted by string is not being inserted into table
+@app.route("/view-pending", methods=["GET"])
 def view_pending_submissions() -> str:
-    pending_cafe_form = PendingCafeForm
     pending_cafes = query_db("select * from submission")
-    if request.method == "POST":
-        pass
-    return render_template("pending.html", submitted_cafes=pending_cafes,
-                           form=pending_cafe_form)
+    cafe_form_combo = []
+    for cafe in pending_cafes:
+        print(cafe["id"])
+        pending_cafe_form = PendingCafeForm(sub_id=cafe["id"])
+        print(pending_cafe_form.sub_id)
+        print(pending_cafe_form.sub_id)
+        cafe_form_combo.append((cafe, pending_cafe_form))
+    return render_template("pending.html", cafe_forms=cafe_form_combo)
 
 
 @app.route("/delete", methods=["GET", "POST"])
@@ -107,11 +123,13 @@ def delete_page() -> str | werkzeug.Response:
         return redirect("/")
     return render_template("delete.html", form=delete_cafe_form, data=current_cafes)
 
-@app.route('/admin-welcome')
+
+@app.route("/admin-welcome")
 @admin_only
 def admin_welcome():
     return render_template("admin-welcome.html")
 
-@app.route('/whoami')
+
+@app.route("/whoami")
 def whoami():
     return f"You are {flask_login.current_user.username}"

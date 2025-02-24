@@ -95,3 +95,21 @@ AttributeError: 'list' object has no attribute 'strip'
 {"'name'": " 'wake forest coffee'", " 'map_url'": " 'n/a'", " 'img_url'": " 'n/a'", " 'location'": " 'wake forest nc'", " 'has_sockets'": " 'Y'", " 'has_toilet'": " 'Y'", " 'has_wifi'": " 'Y'", " 'can_take_calls'": " 'Y'", " 'seats'": " '24'", " 'coffee_price'": " '$4'"}
 >>>
 ```
+
+## Methods and properties of RadioField
+['_Option', '__call__', '__class__', '__delattr__', '__dict__', '__dir__',
+'__doc__', '__eq__', '__format__', '__ge__', '__getattribute__',
+'__getstate__', '__gt__', '__hash__', '__html__', '__init__',
+'__init_subclass__', '__iter__', '__le__', '__lt__', '__module__', '__ne__',
+'__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__',
+'__sizeof__', '__str__', '__subclasshook__', '__weakref__',
+'_choices_generator', '_formfield', '_run_validation_chain', '_translations',
+'check_validators', 'choices', 'coerce', 'data', 'default', 'description',
+'do_not_call_in_templates', 'errors', 'filters', 'flags', 'gettext',
+'has_groups', 'id', 'iter_choices', 'iter_groups', 'label', 'meta', 'name',
+'ngettext', 'object_data', 'option_widget', 'populate_obj', 'post_validate',
+'pre_validate', 'process', 'process_data', 'process_errors',
+'process_formdata', 'raw_data', 'render_kw', 'short_name', 'type', 'validate',
+'validate_choice', 'validators', 'widget'] Decision:
+ How do I tell which cafe is being referenced when I send a POST request submitting
+ the radio form?

@@ -35,12 +35,14 @@ def login():
     login_form = LoginForm()
     if request.method == "POST":
         username = request.form["username"]
-        user = User(DatabaseManager.query_db("select * from user where username=?;",
-                                        args=[username]))
-        print(f"{user.id=}")
-        print(user)
-        if not user.username or user.password != request.form["password"]:
-            return "BAD LOGIN"
+        user_exists = DatabaseManager.query_db("select * from user where username=?;",
+                                        args=[username])
+        if user_exists:
+            user = User()
+        if not user_exists:
+            return f"User {username} does not exist."
+        elif user.password != request.form["password"]:
+            return "Incorrect password."
         flask_login.login_user(user)
         if flask_login.current_user.is_admin:
             return redirect(url_for("admin_welcome"))
